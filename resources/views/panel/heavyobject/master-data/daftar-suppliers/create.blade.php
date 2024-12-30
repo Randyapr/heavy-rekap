@@ -59,7 +59,7 @@
                         <input type="text" class="form-control" id="barang_yang_dikirim" name="barang_yang_dikirim" required>
                     </div>
                     <div class="form-group">
-                        <label for="catatan" class="form-label">Catatan</label>
+                        <label for="catatan" class="form-label">Catatan (opsional)</label>
                         <textarea class="form-control" id="catatan" name="catatan"></textarea>
                     </div>
                     <div>

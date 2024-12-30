@@ -4,7 +4,7 @@
 <div class="container">
     <h1>Daftar Barang</h1>
     
-    // tambihan role anyinggg
+    <!-- tambihan role anyinggg -->
     @if(auth()->user()->role === 'admin')
         <a href="{{ route('daftar-barang.create') }}" class="btn btn-primary mb-3">Tambah Barang</a>
     @endif

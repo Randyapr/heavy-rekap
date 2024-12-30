@@ -62,7 +62,7 @@
                                 <input type="text" class="form-control" id="barang_yang_dikirim" name="barang_yang_dikirim" value="{{ old('barang_yang_dikirim', $supplier->barang_yang_dikirim) }}" required>
                             </div>
                             <div class="form-group">
-                                <label for="catatan" class="form-label">Catatan</label>
+                                <label for="catatan" class="form-label">Catatan (opsional)</label>
                                 <textarea class="form-control" id="catatan" name="catatan">{{ old('catatan', $supplier->catatan) }}</textarea>
                             </div>
                             <div>

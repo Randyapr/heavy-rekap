@@ -8,11 +8,12 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('stok_barangs', function (Blueprint $table) {
+        Schema::create('daftar_barang', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('barang_id')->constrained('daftar_barang')->onDelete('cascade');
-            $table->integer('jumlah_stok');
-            $table->integer('stok_minimum');
+            $table->string('nama_barang');
+            $table->string('kode_barang')->unique();
+            $table->string('kategori_barang');
+            $table->string('satuan');
             $table->string('lokasi_penyimpanan');
             $table->text('keterangan')->nullable();
             $table->timestamps();
@@ -21,6 +22,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('stok_barangs');
+        Schema::dropIfExists('daftar_barang');
     }
 }; 

@@ -64,11 +64,11 @@
                         @forelse($pengeluaran_barang as $item)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>{{ $item->tanggal_pengeluaran }}</td>
-                            <td>{{ optional($item->barang)->nama_barang ?? 'N/A' }}</td>
-                            <td>{{ optional($item->barang)->kode_barang ?? 'N/A' }}</td>
+                            <td>{{ \Carbon\Carbon::parse($item->tanggal_pengeluaran)->format('d/m/Y') }}</td>
+                            <td>{{ $item->nama_barang }}</td>
+                            <td>{{ $item->kode_barang }}</td>
                             <td>{{ $item->jumlah_dikeluarkan }}</td>
-                            <td>{{ optional($item->barang)->satuan ?? 'N/A' }}</td>
+                            <td>{{ $item->satuan }}</td>
                             <td>{{ $item->lokasi_tujuan }}</td>
                             <td>{{ $item->nama_penerima }}</td>
                             <td>{{ $item->nama_petugas }}</td>

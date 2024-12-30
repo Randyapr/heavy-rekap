@@ -37,7 +37,7 @@
     <main id="main" class="main">
         @yield('content')
         <div>
-            <!-- Heavy Cell -->
+            <!-- Heavy Cell didieu -->
             <div class="container">
                 <h1>Daftar Supplier</h1>
                 <a href="{{ route('daftar_suppliers.create') }}" class="btn btn-primary mb-3">Tambah Supplier</a>

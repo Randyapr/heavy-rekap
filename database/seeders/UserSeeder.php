@@ -35,5 +35,6 @@ class UserSeeder extends Seeder
             'password' => Hash::make('drfunding123'),
             'role' => 'user',
         ]);
+        
     }
 }

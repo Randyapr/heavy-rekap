@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PemasukanBarang;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\DaftarBarang;
 
 class PemasukanBarangController extends Controller
 {
@@ -19,28 +20,33 @@ class PemasukanBarangController extends Controller
         return view('panel.heavyobject.pemasukan-barang.create');
     }
 
-    // Store a newly created resource in storage
+    // simpan menyimpan
     public function store(Request $request)
     {
-        // Validasi data
         $request->validate([
-           'tanggal_penerimaan' => 'required|date',
+            'tanggal_penerimaan' => 'required|date',
             'nama_supplier' => 'required',
             'nomor_po' => 'required',
             'nama_barang' => 'required',
             'kode_barang' => 'required',
             'jumlah_diterima' => 'required|integer',
             'satuan' => 'required',
-            'kondisi_barang' => 'required',
-            'lokasi_penyimpanan' => 'required',
+            'kondisi_barang' => 'required|in:baik,rusak,cacat,segel,fresh,ex tele',
+            'lokasi_penyimpanan' => 'required|in:Gudang Cirendang,Gudang Land',
             'nama_petugas' => 'required',
+            'note' => 'nullable'
         ]);
-        
-        // Simpan data ke database
-        PemasukanBarang::create($request->all());
 
-        return redirect()->route('pemasukan-barang.index')->with('success', 'Barang berhasil ditambahkan!');
- }
+        try {
+            PemasukanBarang::create($request->all());
+            return redirect()->route('pemasukan-barang.index')
+                ->with('success', 'Barang berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat menyimpan data!');
+        }
+    }
 
     public function pemasukanBarang()
     {

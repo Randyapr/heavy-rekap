@@ -35,12 +35,22 @@
       <ul id="master-data" class="nav-content collapse" data-bs-parent="#sidebar-nav">
         <li>
           <a href="{{ route('daftar-barang.index') }}">
-            <i class="bi bi-circle"></i><span>Daftar Barang</span>
+            <i class="bi bi-circle"></i><span>Data Barang</span>
           </a>
         </li>
         <li>
-          <a href="{{ url('panel/heavyobject/master-data/daftar-supplier') }}">
-            <i class="bi bi-people"></i><span>Daftar Supplier</span>
+          <a href="{{ route('daftar-supplier.index') }}">
+            <i class="bi bi-circle"></i><span>Data Pemasok</span>
+          </a>
+        </li>
+        <li>
+          <a href="{{ route('lokasi-gudang.index') }}">
+            <i class="bi bi-circle"></i><span>Data Lokasi Gudang</span>
+          </a>
+        </li>
+        <li>
+          <a href="{{ route('kategori-barang.index') }}">
+            <i class="bi bi-circle"></i><span>Data Kategori Barang</span>
           </a>
         </li>
       </ul>

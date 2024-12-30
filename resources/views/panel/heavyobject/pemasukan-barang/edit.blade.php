@@ -60,11 +60,6 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="nomor_po">Nomor PO</label>
-                                <input type="text" name="nomor_po" class="form-control" value="{{ old('nomor_po', $pemasukan_barang->nomor_po) }}" required>
-                            </div>
-
-                            <div class="form-group">
                                 <label for="nama_barang">Nama Barang</label>
                                 <input type="text" name="nama_barang" class="form-control" value="{{ old('nama_barang', $pemasukan_barang->nama_barang) }}" required>
                             </div>

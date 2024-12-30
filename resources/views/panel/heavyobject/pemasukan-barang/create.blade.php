@@ -48,15 +48,11 @@
 
                     <div class="form-group">
                         <label>Tanggal Penerimaan</label>
-                        <input type="datetime-local" name="tanggal_penerimaan" class="form-control" required>
+                        <input type="date" name="tanggal_penerimaan" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label>Nama Supplier</label>
                         <input type="text" name="nama_supplier" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Nomor PO</label>
-                        <input type="text" name="nomor_po" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label>Nama Barang</label>
@@ -67,17 +63,20 @@
                         <input type="text" name="kode_barang" class="form-control" required>
                     </div>
                     <div class="form-group">
+                        <label>Satuan</label>
+                        <input type="text" name="satuan" class="form-control" required>
+                    </div>
+                    <div class="form-group">
                         <label>Jumlah Diterima</label>
                         <input type="number" name="jumlah_diterima" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label for="satuan">Satuan</label>
-                        <input type="text" name="satuan" id="satuan" class="form-control" required>
+                        <label>Nomor PO</label>
+                        <input type="text" name="nomor_po" class="form-control" required>
                     </div>
-
                     <div class="form-group">
                         <label>Kondisi Barang</label>
-                        <select name="kondisi_barang" class="form-control">
+                        <select name="kondisi_barang" class="form-control" required>
                             <option value="baik">Baik</option>
                             <option value="rusak">Rusak</option>
                             <option value="cacat">Cacat</option>
@@ -88,7 +87,10 @@
                     </div>
                     <div class="form-group">
                         <label>Lokasi Penyimpanan</label>
-                        <input type="text" name="lokasi_penyimpanan" class="form-control" required>
+                        <select name="lokasi_penyimpanan" class="form-control" required>
+                            <option value="Gudang Cirendang">Gudang Cirendang</option>
+                            <option value="Gudang Land">Gudang Land</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Nama Petugas</label>

@@ -3,10 +3,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class PengeluaranBahan extends Model
 {
+    use HasFactory;
+
     protected $table = 'pengeluaran_bahan';
     
     protected $fillable = [
@@ -21,5 +25,8 @@ class PengeluaranBahan extends Model
         'note'
     ];
 
-    protected $dates = ['tanggal_pengeluaran'];
+    public function getTanggalPengeluaranFormattedAttribute()
+    {
+        return Carbon::parse($this->tanggal_pengeluaran)->format('d/m/Y');
+    }
 }

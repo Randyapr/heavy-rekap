@@ -7,6 +7,8 @@ use App\Http\Controllers\PengeluaranBahanController;
 use App\Http\Controllers\DaftarBarangController;
 use App\Http\Controllers\DaftarSupplierController;
 use App\Http\Controllers\StokBarangController;
+use App\Http\Controllers\LokasiGudangController;
+use App\Http\Controllers\KategoriBarangController;
 use Illuminate\Support\Facades\Route;
 
 // Route untuk belum login
@@ -41,11 +43,24 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/daftar-supplier', [DaftarSupplierController::class, 'index'])->name('daftar-supplier.index');
         Route::get('/daftar-supplier/create', [DaftarSupplierController::class, 'create'])->name('daftar-supplier.create');
         Route::post('/daftar-supplier', [DaftarSupplierController::class, 'store'])->name('daftar-supplier.store');
+        Route::get('/daftar-supplier/{id}/edit', [DaftarSupplierController::class, 'edit'])->name('daftar-supplier.edit');
+        Route::put('/daftar-supplier/{id}', [DaftarSupplierController::class, 'update'])->name('daftar-supplier.update');
+        Route::delete('/daftar-supplier/{id}', [DaftarSupplierController::class, 'destroy'])->name('daftar-supplier.destroy');
 
         // Stok Barang - Read doang Wabil Khusus User
         Route::get('/stok-barang', [StokBarangController::class, 'index'])->name('stok-barang.index');
         Route::get('/stok-barang/create', [StokBarangController::class, 'create'])->name('stok-barang.create');
         Route::post('/stok-barang', [StokBarangController::class, 'store'])->name('stok-barang.store');
+
+        // Lokasi Gudang
+        Route::get('/lokasi-gudang', [LokasiGudangController::class, 'index'])->name('lokasi-gudang.index');
+        Route::get('/lokasi-gudang/create', [LokasiGudangController::class, 'create'])->name('lokasi-gudang.create');
+        Route::post('/lokasi-gudang', [LokasiGudangController::class, 'store'])->name('lokasi-gudang.store');
+        
+        // Kategori Barang
+        Route::get('/kategori-barang', [KategoriBarangController::class, 'index'])->name('kategori-barang.index');
+        Route::get('/kategori-barang/create', [KategoriBarangController::class, 'create'])->name('kategori-barang.create');
+        Route::post('/kategori-barang', [KategoriBarangController::class, 'store'])->name('kategori-barang.store');
     });
 
     // Route Wabil khususs admin
@@ -74,6 +89,16 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/stok-barang/{id}/edit', [StokBarangController::class, 'edit'])->name('stok-barang.edit');
         Route::put('/stok-barang/{id}', [StokBarangController::class, 'update'])->name('stok-barang.update');
         Route::delete('/stok-barang/{id}', [StokBarangController::class, 'destroy'])->name('stok-barang.destroy');
+
+        // Lokasi Gudang
+        Route::get('/lokasi-gudang/{id}/edit', [LokasiGudangController::class, 'edit'])->name('lokasi-gudang.edit');
+        Route::put('/lokasi-gudang/{id}', [LokasiGudangController::class, 'update'])->name('lokasi-gudang.update');
+        Route::delete('/lokasi-gudang/{id}', [LokasiGudangController::class, 'destroy'])->name('lokasi-gudang.destroy');
+        
+        // Kategori Barang
+        Route::get('/kategori-barang/{id}/edit', [KategoriBarangController::class, 'edit'])->name('kategori-barang.edit');
+        Route::put('/kategori-barang/{id}', [KategoriBarangController::class, 'update'])->name('kategori-barang.update');
+        Route::delete('/kategori-barang/{id}', [KategoriBarangController::class, 'destroy'])->name('kategori-barang.destroy');
     });
 });
 

@@ -11,22 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stok_barang', function (Blueprint $table) {
+        Schema::create('lokasi_gudangs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('barang_id')->constrained('daftar_barang')->onDelete('cascade');
-            $table->integer('jumlah_stok');
-            $table->integer('stok_minimum');
-            $table->string('lokasi_penyimpanan');
+            $table->string('nama_lokasi')->unique();
             $table->text('keterangan')->nullable();
             $table->timestamps();
         });
     }
-    
+
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('stok_barang');
+        Schema::dropIfExists('lokasi_gudangs');
     }
 };

@@ -15,8 +15,8 @@ class StokBarangController extends Controller
 
     public function index()
     {
-        $stokBarang = StokBarang::with('barang')->get();
-        return view('panel.heavyobject.stok-barang.index', compact('stokBarang'));
+        $stok_barang = StokBarang::with('barang')->get();
+        return view('panel.heavyobject.stok-barang.index', compact('stok_barang'));
     }
 
     public function create()

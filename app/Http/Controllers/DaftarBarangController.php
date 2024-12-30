@@ -31,7 +31,7 @@ class DaftarBarangController extends Controller
             'kode_barang' => 'required|unique:daftar_barang',
             'kategori_barang' => 'required',
             'satuan' => 'required',
-            'lokasi_penyimpanan' => 'required',
+            'lokasi_penyimpanan' => 'required'
         ]);
 
         DaftarBarang::create($request->all());

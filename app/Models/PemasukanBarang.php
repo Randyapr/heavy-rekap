@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class PemasukanBarang extends Model
 {
@@ -12,10 +13,8 @@ class PemasukanBarang extends Model
     protected $table = 'pemasukan_barang';
 
     protected $fillable = [
-        'id_penerimaan',
         'tanggal_penerimaan',
         'nama_supplier',
-        'nomor_po',
         'nama_barang',
         'kode_barang',
         'jumlah_diterima',
@@ -23,6 +22,11 @@ class PemasukanBarang extends Model
         'kondisi_barang',
         'lokasi_penyimpanan',
         'nama_petugas',
-        'note',
+        'note'
     ];
+
+    public function getTanggalPenerimaanFormattedAttribute()
+    {
+        return Carbon::parse($this->tanggal_penerimaan)->format('d/m/Y');
+    }
 }
