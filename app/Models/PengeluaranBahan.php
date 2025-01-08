@@ -22,11 +22,27 @@ class PengeluaranBahan extends Model
         'lokasi_tujuan',
         'nama_penerima',
         'nama_petugas',
-        'note'
+        'note',
+        'pemasukan_id'
+    ];
+
+    protected $dates = [
+        'tanggal_pengeluaran',
+        'created_at',
+        'updated_at'
+    ];
+
+    protected $casts = [
+        'tanggal_pengeluaran' => 'datetime'
     ];
 
     public function getTanggalPengeluaranFormattedAttribute()
     {
         return Carbon::parse($this->tanggal_pengeluaran)->format('d/m/Y');
+    }
+
+    public function pemasukan()
+    {
+        return $this->belongsTo(PemasukanBarang::class, 'pemasukan_id');
     }
 }

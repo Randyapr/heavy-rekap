@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\StokBarang;
 use App\Models\DaftarBarang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StokBarangController extends Controller
 {
@@ -15,8 +16,22 @@ class StokBarangController extends Controller
 
     public function index()
     {
-        $stok_barang = StokBarang::with('barang')->get();
-        return view('panel.heavyobject.stok-barang.index', compact('stok_barang'));
+        $stokBarang = DB::table('pemasukan_barang')
+            ->select(
+                'nama_barang',
+                'kode_barang',
+                'lokasi_penyimpanan',
+                DB::raw('SUM(jumlah_diterima) as total_masuk'),
+                DB::raw('(SELECT COALESCE(SUM(jumlah_dikeluarkan), 0) FROM pengeluaran_bahan WHERE kode_barang = pemasukan_barang.kode_barang) as total_keluar')
+            )
+            ->groupBy('nama_barang', 'kode_barang', 'lokasi_penyimpanan')
+            ->get()
+            ->map(function($item) {
+                $item->stok_tersedia = $item->total_masuk - $item->total_keluar;
+                return $item;
+            });
+
+        return view('panel.heavyobject.stok-barang.index', compact('stokBarang'));
     }
 
     public function create()

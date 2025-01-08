@@ -15,8 +15,10 @@ class PemasukanBarang extends Model
     protected $fillable = [
         'tanggal_penerimaan',
         'nama_supplier',
+        'nomor_po',
         'nama_barang',
         'kode_barang',
+        'kategori_barang',
         'jumlah_diterima',
         'satuan',
         'kondisi_barang',
@@ -25,8 +27,28 @@ class PemasukanBarang extends Model
         'note'
     ];
 
+    protected $dates = [
+        'tanggal_penerimaan',
+        'created_at',
+        'updated_at'
+    ];
+
+    protected $casts = [
+        'tanggal_penerimaan' => 'datetime'
+    ];
+
     public function getTanggalPenerimaanFormattedAttribute()
     {
         return Carbon::parse($this->tanggal_penerimaan)->format('d/m/Y');
+    }
+
+    public function pengeluaran()
+    {
+        return $this->hasMany(PengeluaranBahan::class, 'pemasukan_id');
+    }
+
+    public function getStokTersediaAttribute()
+    {
+        return $this->jumlah_diterima - $this->pengeluaran()->sum('jumlah_dikeluarkan');
     }
 }

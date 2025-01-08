@@ -15,8 +15,8 @@ class DaftarBarangController extends Controller
 
     public function index()
     {
-        $barang = DaftarBarang::all();
-        return view('panel.heavyobject.master-data.daftar-barang.index', compact('barang'));
+        $daftarBarang = DaftarBarang::all();
+        return view('panel.master.daftar-barang.index', compact('daftarBarang'));
     }
 
     public function create()

@@ -9,6 +9,7 @@ use App\Http\Controllers\DaftarSupplierController;
 use App\Http\Controllers\StokBarangController;
 use App\Http\Controllers\LokasiGudangController;
 use App\Http\Controllers\KategoriBarangController;
+use App\Http\Controllers\ExportController;
 use Illuminate\Support\Facades\Route;
 
 // Route untuk belum login
@@ -21,6 +22,10 @@ Route::middleware(['guest'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Route untuk mengambil data barang terakhir
+    Route::get('/pemasukan-barang/last-barang', [PemasukanBarangController::class, 'getLastBarang'])
+        ->name('pemasukan-barang.last-barang');
 
     // Route untuk semua penggunaa (admin sama user)
     Route::middleware(['admin-user'])->group(function () {
@@ -47,20 +52,10 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/daftar-supplier/{id}', [DaftarSupplierController::class, 'update'])->name('daftar-supplier.update');
         Route::delete('/daftar-supplier/{id}', [DaftarSupplierController::class, 'destroy'])->name('daftar-supplier.destroy');
 
-        // Stok Barang - Read doang Wabil Khusus User
-        Route::get('/stok-barang', [StokBarangController::class, 'index'])->name('stok-barang.index');
-        Route::get('/stok-barang/create', [StokBarangController::class, 'create'])->name('stok-barang.create');
-        Route::post('/stok-barang', [StokBarangController::class, 'store'])->name('stok-barang.store');
-
         // Lokasi Gudang
         Route::get('/lokasi-gudang', [LokasiGudangController::class, 'index'])->name('lokasi-gudang.index');
         Route::get('/lokasi-gudang/create', [LokasiGudangController::class, 'create'])->name('lokasi-gudang.create');
         Route::post('/lokasi-gudang', [LokasiGudangController::class, 'store'])->name('lokasi-gudang.store');
-        
-        // Kategori Barang
-        Route::get('/kategori-barang', [KategoriBarangController::class, 'index'])->name('kategori-barang.index');
-        Route::get('/kategori-barang/create', [KategoriBarangController::class, 'create'])->name('kategori-barang.create');
-        Route::post('/kategori-barang', [KategoriBarangController::class, 'store'])->name('kategori-barang.store');
     });
 
     // Route Wabil khususs admin
@@ -85,20 +80,23 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/daftar-supplier/{id}', [DaftarSupplierController::class, 'update'])->name('daftar-supplier.update');
         Route::delete('/daftar-supplier/{id}', [DaftarSupplierController::class, 'destroy'])->name('daftar-supplier.destroy');
 
-        // Stok Barang - Update & Delete
-        Route::get('/stok-barang/{id}/edit', [StokBarangController::class, 'edit'])->name('stok-barang.edit');
-        Route::put('/stok-barang/{id}', [StokBarangController::class, 'update'])->name('stok-barang.update');
-        Route::delete('/stok-barang/{id}', [StokBarangController::class, 'destroy'])->name('stok-barang.destroy');
-
         // Lokasi Gudang
         Route::get('/lokasi-gudang/{id}/edit', [LokasiGudangController::class, 'edit'])->name('lokasi-gudang.edit');
         Route::put('/lokasi-gudang/{id}', [LokasiGudangController::class, 'update'])->name('lokasi-gudang.update');
         Route::delete('/lokasi-gudang/{id}', [LokasiGudangController::class, 'destroy'])->name('lokasi-gudang.destroy');
-        
-        // Kategori Barang
-        Route::get('/kategori-barang/{id}/edit', [KategoriBarangController::class, 'edit'])->name('kategori-barang.edit');
-        Route::put('/kategori-barang/{id}', [KategoriBarangController::class, 'update'])->name('kategori-barang.update');
-        Route::delete('/kategori-barang/{id}', [KategoriBarangController::class, 'destroy'])->name('kategori-barang.destroy');
     });
+
+    Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])
+        ->name('dashboard.chart-data')
+        ->middleware(['auth', 'admin-user']);
+
+    Route::get('/pemasukan-barang/tambah-stok', [PemasukanBarangController::class, 'createTambahStok'])
+        ->name('pemasukan-barang.tambah-stok');
 });
 
+// Master Data Routes
+Route::prefix('master-data')->middleware(['auth'])->group(function () {
+    Route::resource('daftar-supplier', DaftarSupplierController::class);
+});
+
+Route::get('/pemasukan-barang/export/{type}', [ExportController::class, 'export'])->name('pemasukan-barang.export');
