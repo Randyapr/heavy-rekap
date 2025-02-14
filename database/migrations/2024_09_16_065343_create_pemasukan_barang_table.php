@@ -10,17 +10,16 @@ return new class extends Migration
     {
         Schema::create('pemasukan_barang', function (Blueprint $table) {
             $table->id();
-            $table->string('batch_number')->nullable();
-            $table->datetime('tanggal_penerimaan');
+            $table->date('tanggal_penerimaan');
             $table->string('nama_supplier');
             $table->string('nomor_po');
             $table->string('nama_barang');
             $table->string('kode_barang');
-            $table->string('kategori_barang');
+            $table->string('kategori_barang')->nullable();
             $table->integer('jumlah_diterima');
             $table->string('satuan');
-            $table->enum('kondisi_barang', ['baik', 'rusak', 'cacat', 'segel', 'fresh', 'ex tele']);
-            $table->enum('lokasi_penyimpanan', ['Gudang Cirendang', 'Gudang Land']);
+            $table->string('kondisi_barang');
+            $table->string('lokasi_penyimpanan');
             $table->string('nama_petugas');
             $table->text('note')->nullable();
             $table->timestamps();

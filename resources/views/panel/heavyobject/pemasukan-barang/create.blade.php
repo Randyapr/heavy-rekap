@@ -26,12 +26,18 @@
                             @enderror
                         </div>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <div class="form-group mb-3">
-                            <label>Nama Supplier</label>
-                            <input type="text" name="nama_supplier" class="form-control" required 
-                                value="{{ old('nama_supplier') }}">
+                            <label>Supplier</label>
+                            <select name="nama_supplier" class="form-select" required>
+                                <option value="">Pilih Supplier</option>
+                                @foreach($suppliers as $supplier)
+                                    <option value="{{ $supplier->nama_supplier }}">
+                                        {{ $supplier->nama_supplier }}
+                                    </option>
+                                @endforeach
+                            </select>
                             @error('nama_supplier')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -50,61 +56,46 @@
                             @enderror
                         </div>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <div class="form-group mb-3">
-                            <label>Nama Barang</label>
-                            <input type="text" name="nama_barang" class="form-control" required 
-                                value="{{ old('nama_barang') }}">
-                            @error('nama_barang')
+                            <label>Pilih Barang</label>
+                            <select name="barang_id" class="form-select" required onchange="fillBarangData(this)">
+                                <option value="">Pilih Barang</option>
+                                @foreach($daftarBarang as $barang)
+                                    <option value="{{ $barang->id }}" 
+                                        data-kode="{{ $barang->kode_barang }}"
+                                        data-nama="{{ $barang->nama_barang }}"
+                                        data-kategori="{{ $barang->kategori_barang }}"
+                                        data-satuan="{{ $barang->satuan }}">
+                                        {{ $barang->kode_barang }} - {{ $barang->nama_barang }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('barang_id')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
                     </div>
                 </div>
 
+                <!-- Hidden inputs untuk data barang -->
+                <input type="hidden" name="kode_barang" id="kode_barang">
+                <input type="hidden" name="nama_barang" id="nama_barang">
+                <input type="hidden" name="kategori_barang" id="kategori_barang">
+                <input type="hidden" name="satuan" id="satuan">
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group mb-3">
-                            <label>Kode Barang</label>
-                            <input type="text" name="kode_barang" id="kodeBarang" class="form-control" required 
-                                value="{{ old('kode_barang') }}" onchange="getLastBarang(this.value)">
-                            @error('kode_barang')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <div class="form-group mb-3">
                             <label>Jumlah Diterima</label>
-                            <input type="number" name="jumlah_diterima" class="form-control" required min="1" 
-                                value="{{ old('jumlah_diterima') }}">
+                            <input type="number" name="jumlah_diterima" class="form-control" required min="1">
                             @error('jumlah_diterima')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group mb-3">
-                            <label>Satuan</label>
-                            <select name="satuan" class="form-select" required>
-                                <option value="">Pilih Satuan</option>
-                                <option value="Pcs" {{ old('satuan') == 'Pcs' ? 'selected' : '' }}>Pcs</option>
-                                <option value="Lembar" {{ old('satuan') == 'Lembar' ? 'selected' : '' }}>Lembar</option>
-                                <option value="Pack" {{ old('satuan') == 'Pack' ? 'selected' : '' }}>Pak</option>
-                                <option value="Roll" {{ old('satuan') == 'Roll' ? 'selected' : '' }}>Roll</option>
-                                <option value="Unit" {{ old('satuan') == 'Unit' ? 'selected' : '' }}>Unit</option>
-                            </select>
-                            @error('satuan')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    </div>
-                    
                     <div class="col-md-6">
                         <div class="form-group mb-3">
                             <label>Kondisi Barang</label>
@@ -127,35 +118,21 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group mb-3">
-                            <label>Kategori Barang</label>
-                            <input type="text" name="kategori_barang" class="form-control" required 
-                                value="{{ old('kategori_barang') }}" placeholder="Masukkan kategori barang">
-                            @error('kategori_barang')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <div class="form-group mb-3">
                             <label>Lokasi Penyimpanan</label>
                             <select name="lokasi_penyimpanan" class="form-select" required>
                                 <option value="">Pilih Lokasi</option>
-                                <option value="Gudang Cirendang" {{ old('lokasi_penyimpanan') == 'Gudang Cirendang' ? 'selected' : '' }}>
-                                    Gudang Cirendang
-                                </option>
-                                <option value="Gudang Land" {{ old('lokasi_penyimpanan') == 'Gudang Land' ? 'selected' : '' }}>
-                                    Gudang Land
-                                </option>
+                                @foreach($lokasiGudangs as $lokasi)
+                                    <option value="{{ $lokasi->nama_lokasi }}">
+                                        {{ $lokasi->nama_lokasi }}
+                                    </option>
+                                @endforeach
                             </select>
                             @error('lokasi_penyimpanan')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
                     </div>
-                </div>
 
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-group mb-3">
                             <label>Nama Petugas</label>
@@ -168,23 +145,33 @@
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label>Kategori Barang</label>
+                            <select name="kategori_barang" class="form-select" required>
+                                <option value="">Pilih Kategori</option>
+                                @foreach($kategoriBarangs as $kategori)
+                                    <option value="{{ $kategori->nama_kategori }}" 
+                                        {{ old('kategori_barang') == $kategori->nama_kategori ? 'selected' : '' }}>
+                                        {{ $kategori->nama_kategori }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('kategori_barang')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group mb-3">
-                    <label>Catatan</label>
+                    <label>Catatan (Opsional)</label>
                     <textarea name="note" class="form-control" rows="3">{{ old('note') }}</textarea>
                     @error('note')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
-
-                <!-- teu kapake  -->
-
-                <!-- <div class="form-group mb-3">
-                    <label>Jenis Input</label>
-                    <select name="jenis_input" class="form-select">
-                        <option value="baru">Input Barang Baru</option>
-                        <option value="tambah">Tambah Stok Barang Ada</option>
-                    </select>
-                </div> -->
 
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary">Simpan</button>
@@ -192,41 +179,21 @@
                 </div>
             </form>
         </div>
+    </div>
+</div>
 
-<!-- @push('scripts')
+@push('scripts')
 <script>
-function getLastBarang(kodeBarang) {
-    if (!kodeBarang) return;
-    
-    fetch(`{{ route('pemasukan-barang.last-barang') }}?kode_barang=${kodeBarang}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Tampilkan modal konfirmasi
-                Swal.fire({
-                    title: 'Barang Sudah Ada',
-                    text: "Apakah anda ingin menambah stok barang yang sudah ada?",
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, tambah stok',
-                    cancelButtonText: 'Tidak, buat baru'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Auto-fill form dan set sebagai tambah stok
-                        document.querySelector('input[name="nama_barang"]').value = data.data.nama_barang;
-                        document.querySelector('input[name="kategori_barang"]').value = data.data.kategori_barang;
-                        document.querySelector('select[name="satuan"]').value = data.data.satuan;
-                        document.querySelector('input[name="nama_supplier"]').value = data.data.nama_supplier;
-                        document.querySelector('select[name="kondisi_barang"]').value = data.data.kondisi_barang;
-                        document.querySelector('select[name="lokasi_penyimpanan"]').value = data.data.lokasi_penyimpanan;
-                        document.querySelector('input[name="is_tambah_stok"]').value = '1';
-                    }
-                });
-            }
-        });
+function fillBarangData(select) {
+    const option = select.options[select.selectedIndex];
+    if (option.value) {
+        document.getElementById('kode_barang').value = option.dataset.kode;
+        document.getElementById('nama_barang').value = option.dataset.nama;
+        document.getElementById('kategori_barang').value = option.dataset.kategori;
+        document.getElementById('satuan').value = option.dataset.satuan;
+    }
 }
 </script>
 @endpush
-    </div>
-</div> -->
+
 @endsection

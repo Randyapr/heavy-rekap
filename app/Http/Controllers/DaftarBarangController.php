@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\DaftarBarang;
+use App\Models\LokasiGudang;
+use App\Models\KategoriBarang;
 use Illuminate\Http\Request;
 
 class DaftarBarangController extends Controller
@@ -16,7 +18,7 @@ class DaftarBarangController extends Controller
     public function index()
     {
         $daftarBarang = DaftarBarang::all();
-        return view('panel.master.daftar-barang.index', compact('daftarBarang'));
+        return view('panel.heavyobject.master-data.daftar-barang.index', compact('daftarBarang'));
     }
 
     public function create()
@@ -26,43 +28,48 @@ class DaftarBarangController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nama_barang' => 'required',
             'kode_barang' => 'required|unique:daftar_barang',
-            'kategori_barang' => 'required',
-            'satuan' => 'required',
-            'lokasi_penyimpanan' => 'required'
+            'satuan' => 'required|in:Pcs,Lembar,Pack,Roll,Unit',
         ]);
 
-        DaftarBarang::create($request->all());
-        return redirect()->route('daftar-barang.index')->with('success', 'Barang berhasil ditambahkan!');
+        DaftarBarang::create($validated);
+        
+        return redirect()->route('daftar-barang.index')
+            ->with('success', 'Data barang berhasil ditambahkan!');
     }
 
     public function edit($id)
     {
         $barang = DaftarBarang::findOrFail($id);
-        return view('panel.heavyobject.master-data.daftar-barang.edit', compact('barang'));
+        $lokasiGudangs = LokasiGudang::all();
+        $kategoriBarangs = KategoriBarang::all();
+
+        return view('panel.heavyobject.master-data.daftar-barang.edit', compact('barang', 'lokasiGudangs', 'kategoriBarangs'));
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nama_barang' => 'required',
             'kode_barang' => 'required|unique:daftar_barang,kode_barang,'.$id,
-            'kategori_barang' => 'required',
-            'satuan' => 'required',
-            'lokasi_penyimpanan' => 'required',
+            'satuan' => 'required|in:Pcs,Lembar,Pack,Roll,Unit',
         ]);
 
         $barang = DaftarBarang::findOrFail($id);
-        $barang->update($request->all());
-        return redirect()->route('daftar-barang.index')->with('success', 'Barang berhasil diupdate!');
+        $barang->update($validated);
+        
+        return redirect()->route('daftar-barang.index')
+            ->with('success', 'Data barang berhasil diupdate!');
     }
 
     public function destroy($id)
     {
         $barang = DaftarBarang::findOrFail($id);
         $barang->delete();
-        return redirect()->route('daftar-barang.index')->with('success', 'Barang berhasil dihapus!');
+        
+        return redirect()->route('daftar-barang.index')
+            ->with('success', 'Barang berhasil dihapus!');
     }
 }

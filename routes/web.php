@@ -29,12 +29,12 @@ Route::middleware(['auth'])->group(function () {
 
     // Route untuk semua penggunaa (admin sama user)
     Route::middleware(['admin-user'])->group(function () {
-        // Pemasukan Batang
+        // Pemasukan Barang - Read & Create
         Route::get('/pemasukan-barang', [PemasukanBarangController::class, 'index'])->name('pemasukan-barang.index');
         Route::get('/pemasukan-barang/create', [PemasukanBarangController::class, 'create'])->name('pemasukan-barang.create');
         Route::post('/pemasukan-barang', [PemasukanBarangController::class, 'store'])->name('pemasukan-barang.store');
         
-        // Pengeluaran Barang - Read & Create only weh
+        // Pengeluaran Barang - Read & Create only
         Route::get('/pengeluaran-barang', [PengeluaranBahanController::class, 'index'])->name('pengeluaran-barang.index');
         Route::get('/pengeluaran-barang/create', [PengeluaranBahanController::class, 'create'])->name('pengeluaran-barang.create');
         Route::post('/pengeluaran-barang', [PengeluaranBahanController::class, 'store'])->name('pengeluaran-barang.store');
@@ -60,7 +60,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Route Wabil khususs admin
     Route::middleware(['admin'])->group(function () {
-        // Pemasukan Batang - Update & Delete
+        // Pemasukan Barang - Update & Delete
         Route::get('/pemasukan-barang/{id}/edit', [PemasukanBarangController::class, 'edit'])->name('pemasukan-barang.edit');
         Route::put('/pemasukan-barang/{id}', [PemasukanBarangController::class, 'update'])->name('pemasukan-barang.update');
         Route::delete('/pemasukan-barang/{id}', [PemasukanBarangController::class, 'destroy'])->name('pemasukan-barang.destroy');
@@ -92,11 +92,50 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/pemasukan-barang/tambah-stok', [PemasukanBarangController::class, 'createTambahStok'])
         ->name('pemasukan-barang.tambah-stok');
+
+    Route::get('/pemasukan-barang/{id}/update-stok', [PemasukanBarangController::class, 'showUpdateStok'])
+        ->name('pemasukan-barang.update-stok');
+    Route::post('/pemasukan-barang/{id}/update-stok', [PemasukanBarangController::class, 'updateStok'])
+        ->name('pemasukan-barang.store-update-stok');
 });
 
 // Master Data Routes
 Route::prefix('master-data')->middleware(['auth'])->group(function () {
+    // Daftar Barang
+    Route::get('/daftar-barang', [DaftarBarangController::class, 'index'])->name('daftar-barang.index');
+    Route::get('/daftar-barang/create', [DaftarBarangController::class, 'create'])->name('daftar-barang.create');
+    Route::post('/daftar-barang', [DaftarBarangController::class, 'store'])->name('daftar-barang.store');
+    Route::get('/daftar-barang/{id}/edit', [DaftarBarangController::class, 'edit'])->name('daftar-barang.edit');
+    Route::put('/daftar-barang/{id}', [DaftarBarangController::class, 'update'])->name('daftar-barang.update');
+    Route::delete('/daftar-barang/{id}', [DaftarBarangController::class, 'destroy'])->name('daftar-barang.destroy');
+    
+    // Daftar Supplier 
     Route::resource('daftar-supplier', DaftarSupplierController::class);
+    
+    // Lokasi Gudang
+    Route::get('/lokasi-gudang', [LokasiGudangController::class, 'index'])->name('lokasi-gudang.index');
+    Route::get('/lokasi-gudang/create', [LokasiGudangController::class, 'create'])->name('lokasi-gudang.create');
+    Route::post('/lokasi-gudang', [LokasiGudangController::class, 'store'])->name('lokasi-gudang.store');
+    Route::get('/lokasi-gudang/{id}/edit', [LokasiGudangController::class, 'edit'])->name('lokasi-gudang.edit');
+    Route::put('/lokasi-gudang/{id}', [LokasiGudangController::class, 'update'])->name('lokasi-gudang.update');
+    Route::delete('/lokasi-gudang/{id}', [LokasiGudangController::class, 'destroy'])->name('lokasi-gudang.destroy');
+    
+    // Kategori Barang
+    Route::get('/kategori-barang', [KategoriBarangController::class, 'index'])->name('kategori-barang.index');
+    Route::get('/kategori-barang/create', [KategoriBarangController::class, 'create'])->name('kategori-barang.create');
+    Route::post('/kategori-barang', [KategoriBarangController::class, 'store'])->name('kategori-barang.store');
+    Route::get('/kategori-barang/{id}/edit', [KategoriBarangController::class, 'edit'])->name('kategori-barang.edit');
+    Route::put('/kategori-barang/{id}', [KategoriBarangController::class, 'update'])->name('kategori-barang.update');
+    Route::delete('/kategori-barang/{id}', [KategoriBarangController::class, 'destroy'])->name('kategori-barang.destroy');
 });
 
 Route::get('/pemasukan-barang/export/{type}', [ExportController::class, 'export'])->name('pemasukan-barang.export');
+
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/pemasukan-barang', [PemasukanBarangController::class, 'index'])->name('pemasukan-barang.index');
+    Route::get('/pemasukan-barang/create', [PemasukanBarangController::class, 'create'])->name('pemasukan-barang.create');
+    Route::post('/pemasukan-barang', [PemasukanBarangController::class, 'store'])->name('pemasukan-barang.store');
+    Route::get('/pemasukan-barang/{id}/edit', [PemasukanBarangController::class, 'edit'])->name('pemasukan-barang.edit');
+    Route::put('/pemasukan-barang/{id}', [PemasukanBarangController::class, 'update'])->name('pemasukan-barang.update');
+    Route::delete('/pemasukan-barang/{id}', [PemasukanBarangController::class, 'destroy'])->name('pemasukan-barang.destroy');
+});

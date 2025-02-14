@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\DaftarSupplier;
-use App\Models\PemasukanBarang;
+use Illuminate\Http\Request;
 
 class DaftarSupplierController extends Controller
 {
@@ -16,50 +15,46 @@ class DaftarSupplierController extends Controller
 
     public function create()
     {
-        $uniqueSuppliers = PemasukanBarang::distinct()->pluck('nama_supplier');
-        $uniqueBarang = PemasukanBarang::distinct()->pluck('nama_barang');
-        
-        return view('panel.heavyobject.master-data.daftar-supplier.create', compact('uniqueSuppliers', 'uniqueBarang'));
+        return view('panel.heavyobject.master-data.daftar-supplier.create');
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nama_supplier' => 'required',
             'no_telp' => 'required',
             'alamat' => 'required',
-            'barang_yang_dikirim' => 'required',
             'catatan' => 'nullable'
         ]);
 
-        DaftarSupplier::create($request->all());
-        return redirect()->route('daftar-supplier.index')->with('success', 'Supplier berhasil ditambahkan!');
+        DaftarSupplier::create($validated);
+        
+        return redirect()->route('daftar-supplier.index')
+            ->with('success', 'Data supplier berhasil ditambahkan!');
     }
 
     public function edit($id)
     {
         $supplier = DaftarSupplier::findOrFail($id);
-        $uniqueSuppliers = PemasukanBarang::distinct()->pluck('nama_supplier');
-        $uniqueBarang = PemasukanBarang::distinct()->pluck('nama_barang');
-        
-        return view('panel.heavyobject.master-data.daftar-supplier.edit', 
-            compact('supplier', 'uniqueSuppliers', 'uniqueBarang'));
+        $uniqueSuppliers = DaftarSupplier::pluck('nama_supplier')->unique();
+
+        return view('panel.heavyobject.master-data.daftar-supplier.edit', compact('supplier', 'uniqueSuppliers'));
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nama_supplier' => 'required',
             'no_telp' => 'required',
             'alamat' => 'required',
-            'barang_yang_dikirim' => 'required',
             'catatan' => 'nullable'
         ]);
 
         $supplier = DaftarSupplier::findOrFail($id);
-        $supplier->update($request->all());
+        $supplier->update($validated);
         
-        return redirect()->route('daftar-supplier.index')->with('success', 'Supplier berhasil diperbarui!');
+        return redirect()->route('daftar-supplier.index')
+            ->with('success', 'Data supplier berhasil diupdate!');
     }
 
     public function destroy($id)
@@ -67,6 +62,7 @@ class DaftarSupplierController extends Controller
         $supplier = DaftarSupplier::findOrFail($id);
         $supplier->delete();
         
-        return redirect()->route('daftar-supplier.index')->with('success', 'Supplier berhasil dihapus!');
+        return redirect()->route('daftar-supplier.index')
+            ->with('success', 'Supplier berhasil dihapus!');
     }
 }

@@ -4,26 +4,31 @@ namespace App\Http\Controllers;
 
 use App\Models\PemasukanBarang;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\PemasukanBarangExport;
 use PDF;
+use Excel;
+use App\Exports\PemasukanBarangExport;
 
 class ExportController extends Controller
 {
-    public function export(Request $request, $type)
+    public function export($type)
     {
-        $data = PemasukanBarang::all();
-
-        switch ($type) {
-            case 'csv':
-                return Excel::download(new PemasukanBarangExport($data), 'pemasukan_barang.csv');
-            case 'excel':
-                return Excel::download(new PemasukanBarangExport($data), 'pemasukan_barang.xlsx');
-            case 'pdf':
-                $pdf = PDF::loadView('exports.pemasukan_barang', ['data' => $data]);
-                return $pdf->download('pemasukan_barang.pdf');
-            default:
-                return redirect()->back()->with('error', 'Format tidak valid');
+        $data = PemasukanBarang::with('pengeluaran')->get();
+        
+        // Tambahkan sisa stok ke setiap record
+        foreach($data as $pemasukan) {
+            $totalKeluar = $pemasukan->pengeluaran()->sum('jumlah_dikeluarkan');
+            $pemasukan->sisa_stok = $pemasukan->jumlah_diterima - $totalKeluar;
         }
+
+        if ($type === 'pdf') {
+            $pdf = PDF::loadView('exports.pemasukan-barang-pdf', compact('data'));
+            return $pdf->download('pemasukan-barang.pdf');
+        }
+
+        if ($type === 'excel') {
+            return Excel::download(new PemasukanBarangExport($data), 'pemasukan-barang.xlsx');
+        }
+
+        return back()->with('error', 'Format tidak didukung');
     }
 }

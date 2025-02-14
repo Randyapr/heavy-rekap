@@ -188,14 +188,16 @@ class PengeluaranBahanController extends Controller
 
     public function destroy($id)
     {
-        if (!Auth::user() || Auth::user()->role !== 'admin') {
-            return redirect()->route('pengeluaran-barang.index')
-                ->with('error', 'Anda tidak memiliki akses untuk menghapus data.');
-        }
-
         try {
-            $bahan = PengeluaranBahan::findOrFail($id);
-            $bahan->delete();
+            if (!auth()->user() || auth()->user()->role !== 'admin') {
+                return redirect()->route('pengeluaran-barang.index')
+                    ->with('error', 'Anda tidak memiliki akses untuk menghapus data.');
+            }
+
+            $pengeluaran = PengeluaranBahan::findOrFail($id);
+            
+            // Hapus pengeluaran tanpa perlu mengembalikan stok
+            $pengeluaran->delete();
 
             return redirect()->route('pengeluaran-barang.index')
                 ->with('success', 'Data pengeluaran berhasil dihapus!');

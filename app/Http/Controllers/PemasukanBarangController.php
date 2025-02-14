@@ -8,12 +8,20 @@ use App\Http\Controllers\Controller;
 use App\Models\DaftarBarang;
 use Carbon\Carbon;
 use App\Models\PengeluaranBahan;
+use App\Models\DaftarSupplier;
+use App\Models\LokasiGudang;
+use App\Models\KategoriBarang;
 
 class PemasukanBarangController extends Controller
 {
     public function index(Request $request)
     {
         $query = PemasukanBarang::query();
+
+        // Filter hanya barang yang belum dikeluarkan atau masih memiliki sisa
+        $query->whereRaw('jumlah_diterima > (SELECT COALESCE(SUM(jumlah_dikeluarkan), 0) 
+            FROM pengeluaran_bahan 
+            WHERE pemasukan_id = pemasukan_barang.id)');
 
         // Pencarian
         if ($request->filled('search')) {
@@ -71,6 +79,12 @@ class PemasukanBarangController extends Controller
 
         $pemasukan_barang = $query->latest('tanggal_penerimaan')->paginate(10);
         
+        // Tambahkan informasi sisa stok untuk setiap pemasukan
+        foreach($pemasukan_barang as $pemasukan) {
+            $totalKeluar = $pemasukan->pengeluaran()->sum('jumlah_dikeluarkan');
+            $pemasukan->sisa_stok = $pemasukan->jumlah_diterima - $totalKeluar;
+        }
+
         // Ambil daftar kategori yang sudah ada untuk filter
         $kategoris = PemasukanBarang::select('kategori_barang')
             ->distinct()
@@ -89,7 +103,17 @@ class PemasukanBarangController extends Controller
 
     public function create()
     {
-        return view('panel.heavyobject.pemasukan-barang.create');
+        $daftarBarang = DaftarBarang::all();
+        $suppliers = DaftarSupplier::all();
+        $lokasiGudangs = LokasiGudang::all();
+        $kategoriBarangs = KategoriBarang::all();
+        
+        return view('panel.heavyobject.pemasukan-barang.create', compact(
+            'daftarBarang', 
+            'suppliers', 
+            'lokasiGudangs',
+            'kategoriBarangs'
+        ));
     }
 
     // Tambahkan method baru untuk mengambil data barang sebelumnya
@@ -135,58 +159,36 @@ class PemasukanBarangController extends Controller
             'tanggal_penerimaan' => 'required|date',
             'nama_supplier' => 'required',
             'nomor_po' => 'required',
-            'nama_barang' => 'required',
-            'kode_barang' => 'required',
+            'barang_id' => 'required|exists:daftar_barang,id',
             'kategori_barang' => 'required',
             'jumlah_diterima' => 'required|numeric|min:1',
-            'satuan' => 'required',
-            'kondisi_barang' => 'required',
-            'lokasi_penyimpanan' => 'required',
+            'kondisi_barang' => 'required|in:baik,rusak,cacat,segel,fresh,ex tele',
+            'lokasi_penyimpanan' => 'required|exists:lokasi_gudangs,nama_lokasi',
             'nama_petugas' => 'required',
-            // 'jenis_input' => 'required|in:baru,tambah'
+            'note' => 'nullable'
         ]);
 
-        try {
-            // if ($request->jenis_input === 'tambah') {
-            //     // Validasi tambahan untuk update stok
-            //     $existingBarang = PemasukanBarang::where('kode_barang', $request->kode_barang)
-            //         ->where('kondisi_barang', $request->kondisi_barang)
-            //         ->where('lokasi_penyimpanan', $request->lokasi_penyimpanan)
-            //         ->latest('tanggal_penerimaan')
-            //         ->first();
+        // Ambil data barang dari master
+        $barang = DaftarBarang::findOrFail($request->barang_id);
 
-            //     if (!$existingBarang) {
-            //         return back()
-            //             ->withInput()
-            //             ->with('error', 'Barang tidak ditemukan untuk update stok');
-            //     }
+        // Buat record pemasukan barang
+        PemasukanBarang::create([
+            'tanggal_penerimaan' => $request->tanggal_penerimaan,
+            'nama_supplier' => $request->nama_supplier,
+            'nomor_po' => $request->nomor_po,
+            'nama_barang' => $barang->nama_barang,
+            'kode_barang' => $barang->kode_barang,
+            'kategori_barang' => $request->kategori_barang,
+            'jumlah_diterima' => $request->jumlah_diterima,
+            'satuan' => $barang->satuan,
+            'kondisi_barang' => $request->kondisi_barang,
+            'lokasi_penyimpanan' => $request->lokasi_penyimpanan,
+            'nama_petugas' => $request->nama_petugas,
+            'note' => $request->note
+        ]);
 
-            //     // Update stok
-            //     $existingBarang->update([
-            //         'jumlah_diterima' => $existingBarang->jumlah_diterima + $request->jumlah_diterima,
-            //         'tanggal_penerimaan' => $request->tanggal_penerimaan,
-            //         'nama_supplier' => $request->nama_supplier,
-            //         'nomor_po' => $request->nomor_po,
-            //         'nama_petugas' => $request->nama_petugas
-            //     ]);
-
-            //     return redirect()
-            //         ->route('pemasukan-barang.index')
-            //         ->with('success', "Stok berhasil ditambah: {$request->jumlah_diterima} {$existingBarang->satuan}");
-            // }
-
-            // Jika input baru
-            PemasukanBarang::create($validated);
-            
-            return redirect()
-                ->route('pemasukan-barang.index')
-                ->with('success', 'Data pemasukan barang baru berhasil ditambahkan');
-
-        } catch (\Exception $e) {
-            return back()
-                ->withInput()
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
+        return redirect()->route('pemasukan-barang.index')
+            ->with('success', 'Data pemasukan berhasil ditambahkan!');
     }
 
     public function pemasukanBarang()
@@ -199,58 +201,115 @@ class PemasukanBarangController extends Controller
     public function edit($id)
     {
         $pemasukan_barang = PemasukanBarang::findOrFail($id);
-        return view('panel.heavyobject.pemasukan-barang.edit', compact('pemasukan_barang'));
+        $daftarBarang = DaftarBarang::all();
+        $suppliers = DaftarSupplier::all();
+        $lokasiGudangs = LokasiGudang::all();
+        
+        return view('panel.heavyobject.pemasukan-barang.edit', compact(
+            'pemasukan_barang',
+            'daftarBarang',
+            'suppliers',
+            'lokasiGudangs'
+        ));
     }
     
     // Update the specified resource in storage
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
+            'barang_id' => 'required|exists:daftar_barang,id',
             'tanggal_penerimaan' => 'required|date',
             'nama_supplier' => 'required',
             'nomor_po' => 'required',
-            'nama_barang' => 'required',
-            'kode_barang' => 'required',
-            'kategori_barang' => 'required|string|max:255',
+            'kategori_barang' => 'required',
             'jumlah_diterima' => 'required|numeric|min:1',
-            'satuan' => 'required|in:Pcs,Lembar,Pack,Roll,Unit',
             'kondisi_barang' => 'required|in:baik,rusak,cacat,segel,fresh,ex tele',
-            'lokasi_penyimpanan' => 'required|in:Gudang Cirendang,Gudang Land',
+            'lokasi_penyimpanan' => 'required|exists:lokasi_gudangs,nama_lokasi',
             'nama_petugas' => 'required',
             'note' => 'nullable'
         ]);
 
-        try {
-            $pemasukan_barang = PemasukanBarang::findOrFail($id);
+        $barang = DaftarBarang::findOrFail($request->barang_id);
+        $pemasukan_barang = PemasukanBarang::findOrFail($id);
 
-            // Cek apakah ada pengeluaran yang terkait
-            $totalPengeluaran = $pemasukan_barang->pengeluaran()->sum('jumlah_dikeluarkan');
-            
-            if ($request->jumlah_diterima < $totalPengeluaran) {
-                return back()
-                    ->withInput()
-                    ->with('error', "Tidak bisa mengubah jumlah diterima menjadi lebih kecil dari total pengeluaran ($totalPengeluaran)");
-            }
+        // Hitung selisih jumlah untuk update stok master
+        $selisih = $validated['jumlah_diterima'] - $pemasukan_barang->jumlah_diterima;
 
-            // Update menggunakan data yang sudah divalidasi
-            $pemasukan_barang->update($validated);
-
-            return redirect()
-                ->route('pemasukan-barang.index')
-                ->with('success', 'Data pemasukan barang berhasil diupdate');
-        } catch (\Exception $e) {
+        // Cek apakah ada pengeluaran yang terkait
+        $totalPengeluaran = $pemasukan_barang->pengeluaran()->sum('jumlah_dikeluarkan');
+        
+        if ($validated['jumlah_diterima'] < $totalPengeluaran) {
             return back()
                 ->withInput()
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+                ->with('error', "Tidak bisa mengubah jumlah diterima menjadi lebih kecil dari total pengeluaran ($totalPengeluaran)");
         }
+
+        // Update pemasukan barang
+        $pemasukan_barang->update([
+            'tanggal_penerimaan' => $validated['tanggal_penerimaan'],
+            'nama_supplier' => $validated['nama_supplier'],
+            'nomor_po' => $validated['nomor_po'],
+            'nama_barang' => $barang->nama_barang,
+            'kode_barang' => $barang->kode_barang,
+            'kategori_barang' => $request->kategori_barang,
+            'jumlah_diterima' => $validated['jumlah_diterima'],
+            'satuan' => $barang->satuan,
+            'kondisi_barang' => $validated['kondisi_barang'],
+            'lokasi_penyimpanan' => $validated['lokasi_penyimpanan'],
+            'nama_petugas' => $validated['nama_petugas'],
+            'note' => $request->note
+        ]);
+
+        // Update stok di master data barang
+        if ($selisih != 0) {
+            $barang->increment('jumlah_diterima', $selisih);
+        }
+
+        return redirect()->route('pemasukan-barang.index')
+            ->with('success', 'Data pemasukan barang berhasil diupdate');
     }
 
     // Remove the specified resource from storage
     public function destroy($id)
     {
-        $pemasukan_barang = PemasukanBarang::findOrFail($id);
-        $pemasukan_barang->delete();
+        $pemasukan = PemasukanBarang::findOrFail($id);
+        $pemasukan->delete();
+        
+        return redirect()->route('pemasukan-barang.index')
+            ->with('success', 'Data pemasukan berhasil dihapus!');
+    }
 
-        return redirect()->route('pemasukan-barang.index')->with('success', 'Pemasukan Barang deleted successfully.');
+    public function showUpdateStok($id)
+    {
+        $pemasukan_barang = PemasukanBarang::findOrFail($id);
+        $totalKeluar = $pemasukan_barang->pengeluaran()->sum('jumlah_dikeluarkan');
+        $pemasukan_barang->sisa_stok = $pemasukan_barang->jumlah_diterima - $totalKeluar;
+        
+        return view('panel.heavyobject.pemasukan-barang.update-stok', compact('pemasukan_barang'));
+    }
+
+    public function updateStok(Request $request, $id)
+    {
+        $request->validate([
+            'jumlah_tambah' => 'required|numeric|min:1',
+            'tanggal_penerimaan' => 'required|date',
+            'note' => 'nullable'
+        ]);
+
+        $pemasukan_barang = PemasukanBarang::findOrFail($id);
+
+        // Update jumlah pada record pemasukan barang
+        $pemasukan_barang->increment('jumlah_diterima', $request->jumlah_tambah);
+        
+        // Update catatan jika ada
+        if ($request->filled('note')) {
+            $note = $pemasukan_barang->note ?? '';
+            $pemasukan_barang->update([
+                'note' => $note . "\n" . $request->note . ' (Update Stok +' . $request->jumlah_tambah . ')'
+            ]);
+        }
+
+        return redirect()->route('pemasukan-barang.index')
+            ->with('success', 'Stok berhasil diupdate');
     }
 }

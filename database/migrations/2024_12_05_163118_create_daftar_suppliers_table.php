@@ -11,9 +11,8 @@ class CreateDaftarSuppliersTable extends Migration
         Schema::create('daftar_suppliers', function (Blueprint $table) {
             $table->id();
             $table->string('nama_supplier');
-            $table->string('no_telp')->nullable();
-            $table->string('alamat');
-            $table->string('barang_yang_dikirim');
+            $table->string('no_telp');
+            $table->text('alamat');
             $table->text('catatan')->nullable();
             $table->timestamps();
         });

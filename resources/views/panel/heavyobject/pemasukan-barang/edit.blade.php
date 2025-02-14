@@ -22,20 +22,21 @@
                             <label>Tanggal Penerimaan</label>
                             <input type="date" name="tanggal_penerimaan" class="form-control" required 
                                 value="{{ old('tanggal_penerimaan', $pemasukan_barang->tanggal_penerimaan->format('Y-m-d')) }}">
-                            @error('tanggal_penerimaan')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
                         </div>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <div class="form-group mb-3">
-                            <label>Nama Supplier</label>
-                            <input type="text" name="nama_supplier" class="form-control" required 
-                                value="{{ old('nama_supplier', $pemasukan_barang->nama_supplier) }}">
-                            @error('nama_supplier')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                            <label>Supplier</label>
+                            <select name="nama_supplier" class="form-select" required>
+                                <option value="">Pilih Supplier</option>
+                                @foreach($suppliers as $supplier)
+                                    <option value="{{ $supplier->nama_supplier }}"
+                                        {{ $pemasukan_barang->nama_supplier == $supplier->nama_supplier ? 'selected' : '' }}>
+                                        {{ $supplier->nama_supplier }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -46,36 +47,36 @@
                             <label>Nomor PO</label>
                             <input type="text" name="nomor_po" class="form-control" required 
                                 value="{{ old('nomor_po', $pemasukan_barang->nomor_po) }}">
-                            @error('nomor_po')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
                         </div>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <div class="form-group mb-3">
-                            <label>Nama Barang</label>
-                            <input type="text" name="nama_barang" class="form-control" required 
-                                value="{{ old('nama_barang', $pemasukan_barang->nama_barang) }}">
-                            @error('nama_barang')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                            <label>Pilih Barang</label>
+                            <select name="barang_id" class="form-select" required onchange="fillBarangData(this)">
+                                <option value="">Pilih Barang</option>
+                                @foreach($daftarBarang as $barang)
+                                    <option value="{{ $barang->id }}"
+                                        data-kode="{{ $barang->kode_barang }}"
+                                        data-nama="{{ $barang->nama_barang }}"
+                                        data-kategori="{{ $barang->kategori_barang }}"
+                                        data-satuan="{{ $barang->satuan }}"
+                                        {{ $pemasukan_barang->kode_barang == $barang->kode_barang ? 'selected' : '' }}>
+                                        {{ $barang->kode_barang }} - {{ $barang->nama_barang }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>
 
+                <!-- Hidden inputs -->
+                <input type="hidden" name="kode_barang" id="kode_barang" value="{{ $pemasukan_barang->kode_barang }}">
+                <input type="hidden" name="nama_barang" id="nama_barang" value="{{ $pemasukan_barang->nama_barang }}">
+                <input type="hidden" name="kategori_barang" id="kategori_barang" value="{{ $pemasukan_barang->kategori_barang }}">
+                <input type="hidden" name="satuan" id="satuan" value="{{ $pemasukan_barang->satuan }}">
+
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group mb-3">
-                            <label>Kode Barang</label>
-                            <input type="text" name="kode_barang" class="form-control" required 
-                                value="{{ old('kode_barang', $pemasukan_barang->kode_barang) }}">
-                            @error('kode_barang')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    </div>
-                    
                     <div class="col-md-6">
                         <div class="form-group mb-3">
                             <label>Jumlah Diterima</label>
@@ -86,9 +87,7 @@
                             @enderror
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
+                    
                     <div class="col-md-6">
                         <div class="form-group mb-3">
                             <label>Satuan</label>
@@ -105,7 +104,9 @@
                             @enderror
                         </div>
                     </div>
-                    
+                </div>
+
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-group mb-3">
                             <label>Kondisi Barang</label>
@@ -123,49 +124,33 @@
                             @enderror
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
+                    
                     <div class="col-md-6">
                         <div class="form-group mb-3">
                             <label>Lokasi Penyimpanan</label>
                             <select name="lokasi_penyimpanan" class="form-select" required>
                                 <option value="">Pilih Lokasi</option>
-                                <option value="Gudang Cirendang" 
-                                    {{ old('lokasi_penyimpanan', $pemasukan_barang->lokasi_penyimpanan) == 'Gudang Cirendang' ? 'selected' : '' }}>
-                                    Gudang Cirendang
-                                </option>
-                                <option value="Gudang Land"
-                                    {{ old('lokasi_penyimpanan', $pemasukan_barang->lokasi_penyimpanan) == 'Gudang Land' ? 'selected' : '' }}>
-                                    Gudang Land
-                                </option>
+                                @foreach($lokasiGudangs as $lokasi)
+                                    <option value="{{ $lokasi->nama_lokasi }}"
+                                        {{ old('lokasi_penyimpanan', $pemasukan_barang->lokasi_penyimpanan) == $lokasi->nama_lokasi ? 'selected' : '' }}>
+                                        {{ $lokasi->nama_lokasi }}
+                                    </option>
+                                @endforeach
                             </select>
                             @error('lokasi_penyimpanan')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
                     </div>
-                    
+                </div>
+
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-group mb-3">
                             <label>Nama Petugas</label>
                             <input type="text" name="nama_petugas" class="form-control" required 
                                 value="{{ old('nama_petugas', $pemasukan_barang->nama_petugas) }}">
                             @error('nama_petugas')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group mb-3">
-                            <label>Kategori Barang</label>
-                            <input type="text" name="kategori_barang" class="form-control" required 
-                                value="{{ old('kategori_barang', $pemasukan_barang->kategori_barang) }}" 
-                                placeholder="Masukkan kategori barang">
-                            @error('kategori_barang')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -188,4 +173,19 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+function fillBarangData(select) {
+    const option = select.options[select.selectedIndex];
+    if (option.value) {
+        document.getElementById('kode_barang').value = option.dataset.kode;
+        document.getElementById('nama_barang').value = option.dataset.nama;
+        document.getElementById('kategori_barang').value = option.dataset.kategori;
+        document.getElementById('satuan').value = option.dataset.satuan;
+    }
+}
+</script>
+@endpush
+
 @endsection

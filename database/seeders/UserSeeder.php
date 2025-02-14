@@ -15,6 +15,13 @@ class UserSeeder extends Seeder
     {
         User::truncate(); // Optional: Clears existing users
 
+
+        // User::create([
+        //     'name' => 'Heavy Object Goup',
+        //     'email' => 'heavyobject@example.com',
+        //     'password' => Hash::make('heavyobject'),
+        //     'role' => 'admin',
+        // ]);
         User::create([
             'name' => 'Heavy Cell User',
             'email' => 'heavycell@example.com',
@@ -22,7 +29,7 @@ class UserSeeder extends Seeder
             'role' => 'admin',
         ]);
 
-        User::create([
+        User::create(attributes: [
             'name' => 'Sticky Up User',
             'email' => 'stickyup@example.com',
             'password' => Hash::make('stickyup123'),

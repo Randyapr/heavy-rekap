@@ -13,17 +13,7 @@ class LokasiGudangController extends Controller
      */
     public function index()
     {
-        // Candak lokasi unik ti daftar barang
-        $lokasiGudangs = DaftarBarang::select('lokasi_penyimpanan')
-            ->distinct()
-            ->get()
-            ->map(function($item) {
-                return [
-                    'nama_lokasi' => $item->lokasi_penyimpanan,
-                    'jumlah_barang' => DaftarBarang::where('lokasi_penyimpanan', $item->lokasi_penyimpanan)->count()
-                ];
-            });
-
+        $lokasiGudangs = LokasiGudang::all();
         return view('panel.heavyobject.master-data.lokasi-gudang.index', compact('lokasiGudangs'));
     }
 
@@ -32,7 +22,7 @@ class LokasiGudangController extends Controller
      */
     public function create()
     {
-        //
+        return view('panel.heavyobject.master-data.lokasi-gudang.create');
     }
 
     /**
@@ -40,7 +30,14 @@ class LokasiGudangController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'nama_lokasi' => 'required|unique:lokasi_gudangs',
+            'keterangan' => 'nullable'
+        ]);
+
+        LokasiGudang::create($validated);
+        return redirect()->route('lokasi-gudang.index')
+            ->with('success', 'Lokasi gudang berhasil ditambahkan!');
     }
 
     /**
@@ -65,14 +62,13 @@ class LokasiGudangController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nama_lokasi' => 'required|unique:lokasi_gudangs,nama_lokasi,'.$id,
             'keterangan' => 'nullable'
         ]);
 
         $lokasi = LokasiGudang::findOrFail($id);
-        $lokasi->update($request->all());
-
+        $lokasi->update($validated);
         return redirect()->route('lokasi-gudang.index')
             ->with('success', 'Lokasi gudang berhasil diupdate!');
     }
@@ -84,7 +80,6 @@ class LokasiGudangController extends Controller
     {
         $lokasi = LokasiGudang::findOrFail($id);
         $lokasi->delete();
-
         return redirect()->route('lokasi-gudang.index')
             ->with('success', 'Lokasi gudang berhasil dihapus!');
     }

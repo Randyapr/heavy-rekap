@@ -13,17 +13,7 @@ class KategoriBarangController extends Controller
      */
     public function index()
     {
-        // Candak kategori unik tina daftar barang
-        $kategoriBarangs = DaftarBarang::select('kategori_barang')
-            ->distinct()
-            ->get()
-            ->map(function($item) {
-                return [
-                    'nama_kategori' => $item->kategori_barang,
-                    'jumlah_barang' => DaftarBarang::where('kategori_barang', $item->kategori_barang)->count()
-                ];
-            });
-
+        $kategoriBarangs = KategoriBarang::all();
         return view('panel.heavyobject.master-data.kategori-barang.index', compact('kategoriBarangs'));
     }
 
@@ -32,7 +22,7 @@ class KategoriBarangController extends Controller
      */
     public function create()
     {
-        //
+        return view('panel.heavyobject.master-data.kategori-barang.create');
     }
 
     /**
@@ -40,7 +30,14 @@ class KategoriBarangController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'nama_kategori' => 'required|unique:kategori_barangs',
+            'keterangan' => 'nullable'
+        ]);
+
+        KategoriBarang::create($validated);
+        return redirect()->route('kategori-barang.index')
+            ->with('success', 'Kategori barang berhasil ditambahkan!');
     }
 
     /**
@@ -65,14 +62,13 @@ class KategoriBarangController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nama_kategori' => 'required|unique:kategori_barangs,nama_kategori,'.$id,
             'keterangan' => 'nullable'
         ]);
 
         $kategori = KategoriBarang::findOrFail($id);
-        $kategori->update($request->all());
-
+        $kategori->update($validated);
         return redirect()->route('kategori-barang.index')
             ->with('success', 'Kategori barang berhasil diupdate!');
     }
@@ -84,7 +80,6 @@ class KategoriBarangController extends Controller
     {
         $kategori = KategoriBarang::findOrFail($id);
         $kategori->delete();
-
         return redirect()->route('kategori-barang.index')
             ->with('success', 'Kategori barang berhasil dihapus!');
     }

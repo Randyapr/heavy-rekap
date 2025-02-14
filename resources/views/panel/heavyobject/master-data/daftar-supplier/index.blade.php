@@ -2,13 +2,14 @@
 
 @section('content')
 <div class="container">
-    <h1>Daftar Supplier</h1>
+    <h1>Data Supplier</h1>
 
     <a href="{{ route('daftar-supplier.create') }}" class="btn btn-primary mb-3">Tambah Supplier</a>
 
     @if(session('success'))
-    <div class="alert alert-success">
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
 
@@ -18,12 +19,11 @@
                 <tr>
                     <th>No</th>
                     <th>Nama Supplier</th>
-                    <th>No Telp</th>
+                    <th>No Telepon</th>
                     <th>Alamat</th>
-                    <th>Barang yang Dikirim</th>
                     <th>Catatan</th>
                     @if(auth()->user()->role === 'admin')
-                    <th>Aksi</th>
+                        <th>Aksi</th>
                     @endif
                 </tr>
             </thead>
@@ -34,7 +34,6 @@
                     <td>{{ $supplier->nama_supplier }}</td>
                     <td>{{ $supplier->no_telp }}</td>
                     <td>{{ $supplier->alamat }}</td>
-                    <td>{{ $supplier->barang_yang_dikirim }}</td>
                     <td>{{ $supplier->catatan ?? '-' }}</td>
                     @if(auth()->user()->role === 'admin')
                     <td>
@@ -43,12 +42,14 @@
                                 class="btn btn-warning btn-sm">
                                 <i class="bi bi-pencil"></i>
                             </a>
-
-                            <button type="button"
-                                class="btn btn-danger btn-sm"
+                            <button type="button" class="btn btn-danger btn-sm"
                                 data-bs-toggle="modal" 
                                 data-bs-target="#deleteModal"
-                                onclick="setDeleteData({{ $supplier->id }}, '{{ $supplier->nama_supplier }}')">
+                                onclick="confirmDelete(
+                                    {{ $supplier->id }}, 
+                                    '{{ $supplier->nama_supplier }}',
+                                    '{{ route('daftar-supplier.destroy', $supplier->id) }}'
+                                )">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </div>
@@ -61,40 +62,14 @@
     </div>
 </div>
 
-<!-- Modal Delete -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Konfirmasi Hapus</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Apakah anda yakin ingin menghapus data supplier <span id="supplierName"></span>?</p>
-                <p class="text-danger"><small>Tindakan ini tidak dapat dibatalkan</small></p>
-            </div>
-            <div class="modal-footer">
-                <form id="deleteForm" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger">Ya, Hapus</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+@include('panel.components.delete-modal')
 
 @push('scripts')
 <script>
-function setDeleteData(id, name) {
-    const form = document.getElementById('deleteForm');
-    form.action = `{{ url('daftar-supplier') }}/${id}`;
-    
-    // Set didieu nama supplier di modal
-    document.getElementById('supplierName').textContent = name;
+function confirmDelete(id, name, route) {
+    document.getElementById('deleteItemName').textContent = name;
+    document.getElementById('deleteForm').action = route;
 }
 </script>
 @endpush
-
 @endsection

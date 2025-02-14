@@ -147,14 +147,19 @@
                                 <td>{{ $item->nama_petugas }}</td>
                                 @if(auth()->user()->role === 'admin')
                                 <td>
-                                    <form action="{{ route('pengeluaran-barang.destroy', $item->id) }}" 
-                                          method="POST" 
-                                          class="d-inline"
-                                          onsubmit="return confirm('Yakin ingin menghapus?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                                    </form>
+                                    <div class="d-flex gap-1">
+                                        <!-- gak guna anying -->
+                                        <!-- <a href="{{ route('pengeluaran-barang.edit', $item->id) }}"
+                                            class="btn btn-warning btn-sm">
+                                            <i class="bi bi-pencil"></i>
+                                        </a> -->
+                                        <button type="button" class="btn btn-danger btn-sm"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deleteModal"
+                                            onclick="confirmDelete({{ $item->id }}, '{{ $item->nama_barang }}')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
                                 </td>
                                 @endif
                             </tr>
@@ -230,6 +235,8 @@
     </div>
 </div>
 
+@include('panel.components.delete-modal')
+
 @push('scripts')
 <script>
 function setModalData(button) {
@@ -244,6 +251,11 @@ function setModalData(button) {
     const inputJumlah = modal.querySelector('input[name="jumlah_dikeluarkan"]');
     inputJumlah.max = data.stok;
     inputJumlah.value = '';
+}
+
+function confirmDelete(id, name) {
+    document.getElementById('deleteItemName').textContent = name;
+    document.getElementById('deleteForm').action = `/pengeluaran-barang/${id}`;
 }
 </script>
 @endpush

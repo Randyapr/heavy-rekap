@@ -1,9 +1,15 @@
 @extends('panel.layouts.app')
 
 @section('content')
-<div class="container">
+<div class="pagetitle">
     <h2>Tambah Supplier</h2>
-    
+</div>
+
+<div class="container">
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+
     <div class="card">
         <div class="card-body">
             <form action="{{ route('daftar-supplier.store') }}" method="POST">
@@ -11,55 +17,39 @@
                 
                 <div class="form-group mb-3">
                     <label>Nama Supplier</label>
-                    <select name="nama_supplier" class="form-control @error('nama_supplier') is-invalid @enderror" required>
-                        <option value="">Pilih Supplier</option>
-                        @foreach($uniqueSuppliers as $supplier)
-                            <option value="{{ $supplier }}">{{ $supplier }}</option>
-                        @endforeach
-                    </select>
+                    <input type="text" name="nama_supplier" class="form-control" required 
+                        value="{{ old('nama_supplier') }}">
                     @error('nama_supplier')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
 
                 <div class="form-group mb-3">
                     <label>No Telp</label>
-                    <input type="text" name="no_telp" class="form-control @error('no_telp') is-invalid @enderror" required>
+                    <input type="text" name="no_telp" class="form-control" required 
+                        value="{{ old('no_telp') }}">
                     @error('no_telp')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
 
                 <div class="form-group mb-3">
                     <label>Alamat</label>
-                    <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" required></textarea>
+                    <textarea name="alamat" class="form-control" rows="3" required>{{ old('alamat') }}</textarea>
                     @error('alamat')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="form-group mb-3">
-                    <label>Barang yang Dikirim</label>
-                    <select name="barang_yang_dikirim" class="form-control @error('barang_yang_dikirim') is-invalid @enderror" required>
-                        <option value="">Pilih Barang</option>
-                        @foreach($uniqueBarang as $barang)
-                            <option value="{{ $barang }}">{{ $barang }}</option>
-                        @endforeach
-                    </select>
-                    @error('barang_yang_dikirim')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
 
                 <div class="form-group mb-3">
                     <label>Catatan (Opsional)</label>
-                    <textarea name="catatan" class="form-control @error('catatan') is-invalid @enderror"></textarea>
+                    <textarea name="catatan" class="form-control" rows="3">{{ old('catatan') }}</textarea>
                     @error('catatan')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
 
-                <div class="mt-3">
+                <div class="form-group">
                     <button type="submit" class="btn btn-primary">Simpan</button>
                     <a href="{{ route('daftar-supplier.index') }}" class="btn btn-secondary">Kembali</a>
                 </div>

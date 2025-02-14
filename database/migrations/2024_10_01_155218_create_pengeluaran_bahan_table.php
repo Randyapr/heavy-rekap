@@ -12,6 +12,7 @@ class CreatePengeluaranBahanTable extends Migration
     {
         Schema::create('pengeluaran_bahan', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('pemasukan_id')->constrained('pemasukan_barang')->onDelete('cascade');
             $table->dateTime('tanggal_pengeluaran');
             $table->string('nama_barang');
             $table->string('kode_barang');
